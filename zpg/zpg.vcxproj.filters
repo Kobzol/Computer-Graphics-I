@@ -99,6 +99,9 @@
     <ClCompile Include="lambert_shader.cpp">
       <Filter>Source Files\tracing</Filter>
     </ClCompile>
+    <ClCompile Include="cubemap.cpp">
+      <Filter>Source Files\geom</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="lambert_shader.h">
       <Filter>Header Files\tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="cubemap.h">
+      <Filter>Header Files\geom</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

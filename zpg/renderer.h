@@ -3,5 +3,5 @@
 class Renderer
 {
 public:
-	void render(Scene& scene, Camera& camera, Shader& shader, cv::Mat& buffer);
+	void render(Scene& scene, Camera& camera, Shader& shader, Cubemap& cubemap, cv::Mat& buffer);
 };

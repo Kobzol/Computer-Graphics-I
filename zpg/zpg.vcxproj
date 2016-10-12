@@ -195,6 +195,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="cubemap.cpp" />
     <ClCompile Include="lambert_shader.cpp" />
     <ClCompile Include="objloader.cpp" />
     <ClCompile Include="renderer.cpp" />
@@ -224,6 +225,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="cubemap.h" />
     <ClInclude Include="lambert_shader.h" />
     <ClInclude Include="objloader.h" />
     <ClInclude Include="renderer.h" />

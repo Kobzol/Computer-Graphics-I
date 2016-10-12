@@ -67,6 +67,7 @@ typedef cv::Vec3f pixel_t;
 #include "surface.h"
 #include "ray.h"
 #include "scene.h"
+#include "cubemap.h"
 
 #include "objloader.h"
 

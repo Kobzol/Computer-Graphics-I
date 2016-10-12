@@ -14,4 +14,6 @@ protected:
 
 	float calcDiffuse(const Vector3& normal, Ray& ray, OmniLight& light);
 	float calcSpecular(const Vector3& normal, Ray& ray, OmniLight& light, const Vector3& eye, float exponent = 1.0f);
+
+	Vector3 getTextureOrMatDiff(Scene& scene, Ray& ray);
 };
