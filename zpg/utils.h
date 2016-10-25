@@ -102,4 +102,6 @@ char * RTrim( char * s );
 */
 char * Trim( char *s );
 
+float clamp(float value, float min, float max);
+
 #endif

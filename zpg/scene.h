@@ -22,6 +22,8 @@ public:
 
 	Surface* getSurface(int index);
 	Material* getMaterial(int index);
+
+	Triangle& getTriangle(const Ray& ray);
 		
 	void commit();
 

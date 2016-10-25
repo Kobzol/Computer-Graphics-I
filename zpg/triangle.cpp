@@ -33,7 +33,7 @@ Vertex Triangle::vertex( const int i )
 	return vertices_[i];
 }
 
-Vector3 Triangle::normal( const Vector3 & p, Vector2 * texture_coord )
+Vector3 Triangle::normal( const Vector3 & p, Vector2 * texture_coord ) const
 {		
 	Vector3 v0 = vertices_[2].position - vertices_[0].position;
 	Vector3 v1 = vertices_[1].position - vertices_[0].position;
@@ -69,7 +69,7 @@ Vector3 Triangle::normal( const Vector3 & p, Vector2 * texture_coord )
 	return normal;	
 }
 
-Vector3 Triangle::normal( const float u, const float v )
+Vector3 Triangle::normal( const float u, const float v ) const
 {
 	// barycentrické souřadnice, P = u * A + v * B + w * C, w = (1 - u - v)
 	Vector3 normal = u * vertices_[1].normal +
@@ -80,7 +80,14 @@ Vector3 Triangle::normal( const float u, const float v )
 	return normal;
 }
 
-Vector2 Triangle::texture_coord( const float u, const float v )
+Vector3 Triangle::normal(const Ray& ray) const
+{
+	Vector3 normal = this->normal(ray.u, ray.v);
+	normal.Normalize();
+	return normal;
+}
+
+Vector2 Triangle::texture_coord( const float u, const float v ) const
 {
 	Vector2 texture_coord = u * vertices_[1].texture_coords[0] +
 		v * vertices_[2].texture_coords[0] +
@@ -94,7 +101,41 @@ Vector3 Triangle::baricenter()
 	return ( vertices_[0].position + vertices_[1].position + vertices_[2].position ) / 3;
 }
 
-Surface * Triangle::surface()
+Surface* Triangle::surface() const
 {	
-	return *reinterpret_cast<Surface **>( vertices_[0].pad ); // FIX: chybí verze pro 64bit
+	return *reinterpret_cast<Surface **>(const_cast<char*>(vertices_[0].pad )); // FIX: chybí verze pro 64bit
+}
+
+Vector3 Triangle::getTextureOrMatDiff(const Ray& ray) const
+{
+	Surface* surface = this->surface();
+	Material* mat = surface->get_material();
+	Texture* texture = mat->get_texture(mat->kDiffuseMapSlot);
+
+	Vector3 color = mat->diffuse;
+	if (texture != nullptr)
+	{
+		Vector2 texCoords = this->texture_coord(ray.u, ray.v);
+		Color4 col = texture->get_texel(texCoords.x, texCoords.y);
+		color = Vector3(col.r, col.g, col.b);
+	}
+
+	return color;
+}
+
+Vector3 Triangle::getTextureOrMatSpec(const Ray & ray) const
+{
+	Surface* surface = this->surface();
+	Material* mat = surface->get_material();
+	Texture* texture = mat->get_texture(mat->kSpecularMapSlot);
+
+	Vector3 color = mat->specular;
+	if (texture != nullptr)
+	{
+		Vector2 texCoords = this->texture_coord(ray.u, ray.v);
+		Color4 col = texture->get_texel(texCoords.x, texCoords.y);
+		color = Vector3(col.r, col.g, col.b);
+	}
+
+	return color;
 }

@@ -115,6 +115,17 @@ public:
 
 	void Print();
 
+	Vector3 reflect(Vector3 normal) const
+	{
+		Vector3 input = *this;
+		input.Normalize();
+		normal.Normalize();
+
+		input = -input;
+
+		return 2 * (input.DotProduct(normal)) * normal - input;
+	}
+
 	inline cv::Vec3f ToOpenCV()
 	{
 		return cv::Vec3f(this->x, this->y, this->z);

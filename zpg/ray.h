@@ -46,6 +46,11 @@ struct Ray : RTCRay
 			org[1] + dir[1] * t,
 			org[2] + dir[2] * t );
 	}
+
+	Vector3 getIntersectPoint() const
+	{
+		return this->eval(this->tfar);
+	}
 };
 
 

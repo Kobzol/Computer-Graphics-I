@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static enum class CubemapDir : int
+enum class CubemapDir : int
 {
 	POS_X = 0,
 	NEG_X = 1,

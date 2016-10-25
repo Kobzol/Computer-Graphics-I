@@ -2,6 +2,7 @@
 #define TRIANGLE_H_
 
 class Surface; // dopøedné deklarace tøídy
+struct Ray;
 
 /*! \class Triangle
 \brief Struktura popisující trojúhelník.
@@ -47,7 +48,7 @@ public:
 
 	\return Normála trojúhelníka v zadaném bodì.
 	*/
-	Vector3 normal( const Vector3 & p, Vector2 * texture_coord = NULL );
+	Vector3 normal( const Vector3 & p, Vector2 * texture_coord = NULL ) const;
 
 	//! Vypoète normálu trojúhelníka v zadaném bodì.
 	/*!
@@ -56,7 +57,9 @@ public:
 
 	\return Normála trojúhelníka v zadaném bodì.
 	*/
-	Vector3 normal( const float u, const float v );
+	Vector3 normal( const float u, const float v ) const;
+
+	Vector3 normal(const Ray& ray) const;
 
 	//! Vypoète texturovací souøadnici trojúhelníka v zadaném bodì.
 	/*!
@@ -65,7 +68,7 @@ public:
 
 	\return Texturovací souøadnice v zadaném bodì.
 	*/
-	Vector2 texture_coord( const float u, const float v );
+	Vector2 texture_coord( const float u, const float v ) const;
 
 	//! Baricentr trojúhelníka.
 	/*!
@@ -79,7 +82,10 @@ public:
 	/*!
 	\return Ukazatel na sí.
 	*/
-	Surface * surface();
+	Surface* surface() const;
+
+	Vector3 getTextureOrMatDiff(const Ray& ray) const;
+	Vector3 getTextureOrMatSpec(const Ray& ray) const;
 
 protected:
 

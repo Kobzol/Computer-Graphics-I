@@ -11,16 +11,21 @@ Scene::~Scene()
 	rtcDeleteScene(this->scene);
 }
 
+static void filter_intersection(void* user_ptr, Ray& ray)
+{
+	if (ray.tfar < 0.01f)
+	{
+		ray.geomID = RTC_INVALID_GEOMETRY_ID;
+	}
+}
+
 void Scene::addSurface(Surface* surface)
 {
 	this->surfaces.push_back(surface);
 	unsigned geom_id = rtcNewTriangleMesh(scene, RTC_GEOMETRY_STATIC, surface->no_triangles(), surface->no_vertices());
 
-	//rtcSetUserData, rtcSetBoundsFunction, rtcSetIntersectFunction, rtcSetOccludedFunction,
 	rtcSetUserData(scene, geom_id, &surface);
-	//rtcSetOcclusionFilterFunction, rtcSetIntersectionFilterFunction		
-	//rtcSetOcclusionFilterFunction( scene, geom_id, reinterpret_cast< RTCFilterFunc >( &filter_occlusion ) );
-	//rtcSetIntersectionFilterFunction( scene, geom_id, reinterpret_cast< RTCFilterFunc >( &filter_intersection ) );
+	rtcSetIntersectionFilterFunction(scene, geom_id, reinterpret_cast< RTCFilterFunc >(&filter_intersection));
 
 	// kopírování samotných vertexů trojúhelníků
 	embree_structs::Vertex* vertices = static_cast<embree_structs::Vertex*>(rtcMapBuffer(scene, geom_id, RTC_VERTEX_BUFFER));
@@ -67,6 +72,12 @@ Surface* Scene::getSurface(int index)
 Material* Scene::getMaterial(int index)
 {
 	return this->materials[index];
+}
+
+Triangle& Scene::getTriangle(const Ray& ray)
+{
+	Surface* surface = this->getSurface(ray.geomID);
+	return surface->get_triangle(ray.primID);
 }
 
 void Scene::commit()

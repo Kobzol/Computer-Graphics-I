@@ -184,3 +184,8 @@ char * Trim( char * s )
 {
 	return RTrim( LTrim( s ) );
 }
+
+float clamp(float value, float min, float max)
+{
+	return MAX(min, MIN(value, max));
+}
