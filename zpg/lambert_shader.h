@@ -6,5 +6,4 @@ class LambertShader : public Shader
 {
 public:
 	virtual Vector3 calculateColor(Scene& scene, Ray& ray, const Vector3& eye, OmniLight& light) override;
-	virtual Vector3 calculateColor(Scene& scene, Ray& ray, const Vector3& eye, OmniLight& light, Vector3 spec) override;
 };

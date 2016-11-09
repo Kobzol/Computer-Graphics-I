@@ -22,3 +22,15 @@ float Shader::calcSpecular(const Vector3& normal, const Ray& ray, const OmniLigh
 
 	return pow(clamp(normal.DotProduct(half), 0.0f, 1.0f), exponent);
 }
+float Shader::calcShadow(Scene& scene, const Vector3& point, const OmniLight& light)
+{
+	Vector3 toLight = light.position - point;
+	Ray rayToLight(point, toLight, 0.01f, toLight.L2Norm());
+	rtcOccluded(scene.handle(), rayToLight);
+
+	if (rayToLight.hasCollided())
+	{
+		return 0.0f;
+	}
+	else return 1.0f;
+}

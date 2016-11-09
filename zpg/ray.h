@@ -13,6 +13,7 @@
 struct Ray : RTCRay
 {
 	float transparency;
+	float refractionIndex = 1.0f;
 
 	Ray( const Vector3 & origin, Vector3 direction, const float t_near = 0.0f, const float t_far = FLT_MAX )
 	{
@@ -50,6 +51,11 @@ struct Ray : RTCRay
 	Vector3 getIntersectPoint() const
 	{
 		return this->eval(this->tfar);
+	}
+
+	bool hasCollided() const
+	{
+		return this->geomID != RTC_INVALID_GEOMETRY_ID;
 	}
 };
 

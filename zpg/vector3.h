@@ -125,6 +125,23 @@ public:
 
 		return 2 * (input.DotProduct(normal)) * normal - input;
 	}
+	Vector3 refract(Vector3 normal, float n1, float n2) const
+	{
+		Vector3 l = *this;
+		l.Normalize();
+		normal.Normalize();
+
+		float r = n1 / n2;
+		float c = (-normal).DotProduct(l);
+
+		if (c < 0)
+		{
+			normal = -normal;
+			c = (-normal).DotProduct(l);
+		}
+
+		return r * l + (r * c - sqrt(1 - (r * r) * (1 - (c * c)))) * normal;
+	}
 
 	inline cv::Vec3f ToOpenCV()
 	{
