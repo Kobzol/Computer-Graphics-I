@@ -3,6 +3,8 @@
 class Shader
 {
 public:
+	virtual ~Shader();
+
 	virtual Vector3 calculateColor(Scene& scene, Ray& ray, const Vector3& eye, OmniLight& light) = 0;
 
 	float calcDiffuse(const Vector3& normal, const Ray& ray, const OmniLight& light);

@@ -142,6 +142,37 @@ public:
 
 		return r * l + (r * c - sqrt(1 - (r * r) * (1 - (c * c)))) * normal;
 	}
+	Vector3 reverseRefract(Vector3 normal, float n1, float n2) const
+	{
+		Vector3 rf = -(*this);
+		rf.Normalize();
+		normal.Normalize();
+
+		float r = n1 / n2;
+		
+		float cos_02 = normal.DotProduct(rf);
+
+		if (cos_02 < 0.0f)
+		{
+			normal = -normal;
+			cos_02 = normal.DotProduct(rf);
+		}
+
+		float cos_01 = sqrt(1 - (r *r) * (1 - (cos_02 * cos_02)));
+
+		Vector3 rr = r * rf - (r * cos_02 + cos_01) * normal;
+		Vector3 l = rr - (2 * (normal.DotProduct(rr))) * normal;
+
+		return -l;
+	}
+
+	bool IsZero()
+	{
+		return
+			this->x == 0.0f &&
+			this->y == 0.0f &&
+			this->z == 0.0f;
+	}
 
 	inline cv::Vec3f ToOpenCV()
 	{

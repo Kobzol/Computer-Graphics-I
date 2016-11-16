@@ -102,6 +102,15 @@
     <ClCompile Include="cubemap.cpp">
       <Filter>Source Files\geom</Filter>
     </ClCompile>
+    <ClCompile Include="tracer.cpp">
+      <Filter>Source Files\tracing</Filter>
+    </ClCompile>
+    <ClCompile Include="whitted_tracer.cpp">
+      <Filter>Source Files\tracing</Filter>
+    </ClCompile>
+    <ClCompile Include="path_tracer.cpp">
+      <Filter>Source Files\tracing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -172,6 +181,15 @@
     </ClInclude>
     <ClInclude Include="cubemap.h">
       <Filter>Header Files\geom</Filter>
+    </ClInclude>
+    <ClInclude Include="tracer.h">
+      <Filter>Header Files\tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="whitted_tracer.h">
+      <Filter>Header Files\tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="path_tracer.h">
+      <Filter>Header Files\tracing</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

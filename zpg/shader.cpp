@@ -1,5 +1,9 @@
 #include "stdafx.h"
-#include "shader.h"
+
+Shader::~Shader()
+{
+
+}
 
 float Shader::calcDiffuse(const Vector3& normal, const Ray& ray, const  OmniLight& light)
 {
