@@ -73,10 +73,11 @@ typedef cv::Vec3f pixel_t;
 
 #include "shader.h"
 
+#include "camera.h"
+
 #include "tracer.h"
 #include "whitted_tracer.h"
 #include "path_tracer.h"
 
-#include "camera.h"
 #include "lambert_shader.h"
 #include "renderer.h"

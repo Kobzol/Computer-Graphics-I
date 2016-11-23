@@ -5,18 +5,14 @@ void Renderer::render(Scene& scene, Camera& camera, Tracer& tracer, Cubemap& cub
 {
 	OmniLight light = OmniLight(camera.view_from());
 
-#pragma omp parallel for
+#ifndef _DEBUG
+	#pragma omp parallel for schedule(dynamic, 5) shared(camera, tracer, scene, light, cubemap, buffer)
+#endif
 	for (int y = 0; y < camera.height(); y++)
 	{
 		for (int x = 0; x < camera.width(); x++)
 		{
-			Ray ray = camera.GenerateRay(x, y);
-			
-			Vector3 color(0.0f, 0.0f, 0.0f);
-			for (int i = 0; i < tracer.getSamplesPerPixel(); i++)
-			{
-				color += tracer.trace(scene, ray, light, cubemap, 8);
-			}
+			Vector3 color = tracer.trace(scene, camera, x, y, light, cubemap);
 			buffer.at<pixel_t>(y, x) = pixel_t(color.z, color.y, color.x);
 		}
 	}

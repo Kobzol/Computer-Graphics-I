@@ -14,7 +14,7 @@ Material::Material()
 
 	emission = Vector3( 0.0f, 0.0f, 0.0f );	
 
-	reflectivity = 0.6f;
+	reflectivity = 0.7f;
 	shininess = 1;
 
 	ior = -1;

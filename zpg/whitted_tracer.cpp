@@ -1,13 +1,28 @@
 #include "stdafx.h"
 
-WhittedTracer::WhittedTracer(Shader& shader): shader(shader)
+WhittedTracer::WhittedTracer(int recursionLimit, Shader& shader): recursionLimit(recursionLimit), shader(shader)
 {
 
 }
 
-Vector3 WhittedTracer::trace(Scene& scene, Ray ray, OmniLight& light, Cubemap& cubemap, int depth)
+Vector3 WhittedTracer::trace(Scene& scene, Camera &camera, float x, float y, OmniLight& light, Cubemap& cubemap)
 {
-	return this->trace(scene, ray, light, cubemap, 0, depth);
+	const int count = 5;
+	float positions[count][2] = {
+		{ -0.5f, -0.5f },
+		{ 0.5f, -0.5f },
+		{ 0.0f, 0.0f },
+		{ 0.5f, 0.5f },
+		{ -0.5f, 0.5f }
+	};
+
+	Vector3 color(0.0f, 0.0f, 0.0f);
+	for (int i = 0; i < count; i++)
+	{
+		color += this->trace(scene, camera.GenerateRay(x + positions[i][0], y + positions[i][1]), light, cubemap, 0, this->recursionLimit);
+	}
+
+	return color / static_cast<float>(count);
 }
 
 float switchIor(float ior)
@@ -47,7 +62,6 @@ float schlick(float n1, float n2, Vector3 rayDir, Vector3 normal)
 // switch direction
 float calcR(float n1, float n2, Vector3 normal, Vector3 ray, Vector3 refracted)
 {
-	return schlick(n1, n2, ray, normal);
 	ray.Normalize();
 	normal.Normalize();
 	refracted.Normalize();
@@ -71,13 +85,6 @@ Vector3 WhittedTracer::trace(Scene& scene, Ray ray, OmniLight& light, Cubemap& c
 {
 	Vector3 rayDir = Vector3(ray.dir);
 	rayDir.Normalize();
-
-	if (depth >= maxDepth)
-	{
-		Color4 envColor = cubemap.get_texel(rayDir);
-		return Vector3(envColor.r, envColor.g, envColor.b);
-	}
-
 	rtcIntersect(scene.handle(), ray);
 
 	if (!ray.hasCollided())
@@ -87,8 +94,13 @@ Vector3 WhittedTracer::trace(Scene& scene, Ray ray, OmniLight& light, Cubemap& c
 	}
 
 	Triangle& triangle = scene.getTriangle(ray);
-	Vector3 normal = triangle.normal(ray);
+	Vector3 normal = triangle.normal(ray);	// turn the normal immediately
 	Vector3 point = ray.getIntersectPoint();
+
+	if (normal.DotProduct(-rayDir) < 0)
+	{
+		normal = -normal;
+	}
 
 	Ray reflectedRay(point, rayDir.reflect(normal), 0.01f);
 	reflectedRay.refractionIndex = ray.refractionIndex;
@@ -108,17 +120,25 @@ Vector3 WhittedTracer::trace(Scene& scene, Ray ray, OmniLight& light, Cubemap& c
 	{
 		float n1 = ray.refractionIndex;
 		float n2 = switchIor(ray.refractionIndex);
+
 		Vector3 refractedDir = rayDir.reverseRefract(normal, n1, n2);
 
 		Ray refractedRay(point, refractedDir, 0.01f);
 		refractedRay.refractionIndex = n2;
 
-		float coefReflect = calcR(n1, n2, normal, rayDir, refractedDir);
-		float coefRefract = 1.0f - coefReflect;
+		Vector3 color(0.0f, 0.0f, 0.0f);
+		float coefReflect = 1.0f;
 
-		return
-			this->trace(scene, reflectedRay, light, cubemap, depth + 1, maxDepth) * coefReflect * specular +
-			this->trace(scene, refractedRay, light, cubemap, depth + 1, maxDepth) * coefRefract * mat->diffuse;
+		if (!refractedDir.IsZero())
+		{
+			coefReflect = calcR(n1, n2, normal, rayDir, refractedDir);
+			float coefRefract = 1.0f - coefReflect;
+			color += this->trace(scene, refractedRay, light, cubemap, depth + 1, maxDepth) * coefRefract * mat->diffuse;
+		}
+
+		color += this->trace(scene, reflectedRay, light, cubemap, depth + 1, maxDepth) * coefReflect * mat->diffuse;
+		
+		return color;
 	}
 	else
 	{

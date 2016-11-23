@@ -158,9 +158,17 @@ public:
 			cos_02 = normal.DotProduct(rf);
 		}
 
-		float cos_01 = sqrt(1 - (r *r) * (1 - (cos_02 * cos_02)));
+		float phi = 1 - (r *r) * (1 - (cos_02 * cos_02));
+
+		if (phi < 0.0f)
+		{
+			return Vector3(0.0f, 0.0f, 0.0f);
+		}
+
+		float cos_01 = sqrt(phi);
 
 		Vector3 rr = r * rf - (r * cos_02 + cos_01) * normal;
+		rr.Normalize();
 		Vector3 l = rr - (2 * (normal.DotProduct(rr))) * normal;
 
 		return -l;
