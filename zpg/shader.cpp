@@ -5,6 +5,14 @@ Shader::~Shader()
 
 }
 
+Vector3 Shader::calcDiffuseColor(Scene& scene, const Vector3& normal, const Ray& ray, const OmniLight& light)
+{
+	Triangle& triangle = scene.getTriangle(ray);
+	float diff = this->calcDiffuse(normal, ray, light);
+
+	return diff * triangle.getTextureOrMatDiff(ray);
+}
+
 float Shader::calcDiffuse(const Vector3& normal, const Ray& ray, const  OmniLight& light)
 {
 	Vector3 toLight = light.position - ray.getIntersectPoint();

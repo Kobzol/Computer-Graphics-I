@@ -160,6 +160,7 @@ public:
 
 		float phi = 1 - (r *r) * (1 - (cos_02 * cos_02));
 
+		// tir
 		if (phi < 0.0f)
 		{
 			return Vector3(0.0f, 0.0f, 0.0f);
@@ -170,6 +171,7 @@ public:
 		Vector3 rr = r * rf - (r * cos_02 + cos_01) * normal;
 		rr.Normalize();
 		Vector3 l = rr - (2 * (normal.DotProduct(rr))) * normal;
+		l.Normalize();
 
 		return -l;
 	}

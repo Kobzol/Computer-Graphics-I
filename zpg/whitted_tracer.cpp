@@ -25,23 +25,23 @@ Vector3 WhittedTracer::trace(Scene& scene, Camera &camera, float x, float y, Omn
 	return color / static_cast<float>(count);
 }
 
-float switchIor(float ior)
+static float switchIor(float ior)
 {
 	return 2.5f - ior;	// 1.0 -> 1.5, 1.5 -> 1.0
 }
 
-float calcRS(float n1, float n2, float cosi, float cost)
+static float calcRS(float n1, float n2, float cosi, float cost)
 {
 	float val = (n1 * cosi - n2 * cost) / (n1 * cosi + n2 * cost);
 	return val * val;
 }
-float calcRP(float n1, float n2, float cosi, float cost)
+static float calcRP(float n1, float n2, float cosi, float cost)
 {
 	float val = (n1 * cost - n2 * cosi) / (n1 * cost + n2 * cosi);
 	return val * val;
 }
 
-float schlick(float n1, float n2, Vector3 rayDir, Vector3 normal)
+static float schlick(float n1, float n2, Vector3 rayDir, Vector3 normal)
 {
 	float r0 = (n1 - n2) / (n1 + n2);
 	r0 *= r0;
@@ -60,7 +60,7 @@ float schlick(float n1, float n2, Vector3 rayDir, Vector3 normal)
 }
 
 // switch direction
-float calcR(float n1, float n2, Vector3 normal, Vector3 ray, Vector3 refracted)
+static float calcR(float n1, float n2, Vector3 normal, Vector3 ray, Vector3 refracted)
 {
 	ray.Normalize();
 	normal.Normalize();
@@ -94,7 +94,7 @@ Vector3 WhittedTracer::trace(Scene& scene, Ray ray, OmniLight& light, Cubemap& c
 	}
 
 	Triangle& triangle = scene.getTriangle(ray);
-	Vector3 normal = triangle.normal(ray);	// turn the normal immediately
+	Vector3 normal = triangle.normal(ray);
 	Vector3 point = ray.getIntersectPoint();
 
 	if (normal.DotProduct(-rayDir) < 0)
@@ -109,13 +109,8 @@ Vector3 WhittedTracer::trace(Scene& scene, Ray ray, OmniLight& light, Cubemap& c
 	Vector3 eye = point - rayDir;
 
 	std::string matName = mat->get_name();
-	Vector3 specular = this->shader.calcSpecular(normal, ray, light, eye, 4.0f) * mat->specular;
+	Vector3 specular = this->shader.calcSpecular(normal, ray, light, eye, 3.0f) * mat->specular;
 
-	// totální odraz, kvazi nahodna cisla, total compendium book
-	// fr lambertovsky povrch - albedo / pi (albedo <0, 1>)
-	// path tracing - vzdycky jenom jeden paprsek, supersampling
-	// kdyz dojde rekurze, vratit 0
-	// kdyz vyletime ze sceny, vratit 1 (globalni svetlo) nebo cube mapu
 	if (matName == "green_plastic_transparent" && depth < maxDepth)
 	{
 		float n1 = ray.refractionIndex;
@@ -127,14 +122,17 @@ Vector3 WhittedTracer::trace(Scene& scene, Ray ray, OmniLight& light, Cubemap& c
 		refractedRay.refractionIndex = n2;
 
 		Vector3 color(0.0f, 0.0f, 0.0f);
-		float coefReflect = 1.0f;
+		float coefReflect = calcR(n1, n2, normal, rayDir, refractedDir);
 
 		if (!refractedDir.IsZero())
 		{
-			coefReflect = calcR(n1, n2, normal, rayDir, refractedDir);
 			float coefRefract = 1.0f - coefReflect;
 			color += this->trace(scene, refractedRay, light, cubemap, depth + 1, maxDepth) * coefRefract * mat->diffuse;
 		}
+		else coefReflect = 0.5f;
+
+		reflectedRay = Ray(point, rayDir.reflect(normal), 0.01f);
+		reflectedRay.refractionIndex = ray.refractionIndex;
 
 		color += this->trace(scene, reflectedRay, light, cubemap, depth + 1, maxDepth) * coefReflect * mat->diffuse;
 		
